@@ -1,0 +1,990 @@
+#include<iostream>
+#include<string.h>
+#include<stdlib.h>
+using namespace std;
+
+
+// Group Members
+// 2017347
+// 2017438
+
+const int MaxCity = 10;
+
+
+struct flightNode {
+    int flightNo;            	/* flight number */
+    string departCity;          /* departure city */
+    int timeDepart;          	/* departure time hhmm, e.g. 830, 1220, etc. */
+    string arrivalCity;          	/* arrival city */
+    int timeArrival;           	/* arrival time hhmm, e.g. 950, 1240, etc. */
+    int noOfPassengers;       	/* number of passengers on the flight */
+    flightNode *nextDeparture; 	/* next departure node from this city */
+    flightNode *nextArrival; 	/* next arrival node to this city */
+};
+
+
+struct cityListNode {
+    string cityName;           	   /* name of the city */
+    flightNode *nextDeparture;    /* first departure from this city */
+    flightNode *nextArrival;      /* first arrival to this city */
+};
+
+
+struct reservationNode {
+	int departDay;
+	int arriveDay;
+	int departtime;
+	int arrivetime;
+	int flightNoDepart;
+	int flightNoArrive;
+    string departcity;
+	string arrivecity;	
+    string firstName;         /* first name of the passenger */         
+	string lastName;         /* last name of the passenger */
+    int tripType;            /* ROUNDTRIP or ONEWAY */
+    reservationNode *nextReserve; /* next reservation in linked list */
+};
+
+
+cityListNode *citylist = new cityListNode[MaxCity];
+
+
+
+void DataEntryDeparture(string Name,string arrival,string departure,int number,int depart,int arrive)
+{
+	flightNode *newnode = new flightNode;
+	flightNode *temp = new flightNode;
+	newnode->arrivalCity = arrival;
+	newnode->departCity = departure;
+	newnode->flightNo = number;
+	newnode->timeDepart = depart;
+	newnode->timeArrival = arrive;
+	newnode->nextDeparture = NULL;
+	
+	for(int i=0;i<10;i++)
+	{
+		if(citylist[i].cityName == Name)
+		{
+			if(citylist[i].nextDeparture==NULL)
+			{
+				citylist[i].nextDeparture = newnode;
+			}
+			else
+			{
+				temp = citylist[i].nextDeparture;
+				for(;temp!=NULL;temp=temp->nextDeparture)
+				{
+					if(temp->nextDeparture == NULL)
+					{
+						temp->nextDeparture = newnode;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+void DataEntryArrival(string Name,string arrival,string departure,int number,int depart,int arrive)
+{
+	flightNode *newnode = new flightNode;
+	flightNode *temp;
+	newnode->arrivalCity = arrival;
+	newnode->departCity = departure;
+	newnode->flightNo = number;
+	newnode->timeDepart = depart;
+	newnode->timeArrival = arrive;
+	newnode->nextArrival = NULL;
+	
+	for(int i=0;i<10;i++)
+	{
+		if(citylist[i].cityName == Name)
+		{
+			if(citylist[i].nextArrival==NULL)
+			{
+				citylist[i].nextArrival = newnode;
+			}
+			else
+			{
+				temp = citylist[i].nextArrival;
+				for(;temp!=NULL;temp=temp->nextArrival)
+				{
+					if(temp->nextArrival == NULL)
+					{
+						temp->nextArrival = newnode;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void Allflights(cityListNode citylist[])
+{
+	system("cls");
+	for(int i=0;i<10;i++)
+	{
+		cout<<"********************"<<endl;
+		cout<<"City Name: "<<citylist[i].cityName<<endl;
+		cout<<"********************"<<endl;
+		cout<<"----------------------"<<endl;
+		cout<<"Flight List Departure"<<endl;
+		cout<<"----------------------"<<endl;
+		for(flightNode *temp = citylist[i].nextDeparture;temp!=NULL;temp = temp->nextDeparture)
+		{
+			cout<<"Flight Number: "<<temp->flightNo<<endl;
+			cout<<"Departure City: "<<temp->departCity<<"\t\t\t";
+			cout<<"Arrival City: "<<temp->arrivalCity<<endl;
+			cout<<"Departure Time: "<<temp->timeDepart<<"\t\t\t";
+			cout<<"Arrival Time: "<<temp->timeArrival<<endl;
+		}
+		cout<<endl;
+		cout<<"----------------------"<<endl;
+		cout<<"Flight List Arrival"<<endl;
+		cout<<"----------------------"<<endl;
+		for(flightNode *temp = citylist[i].nextArrival;temp!=NULL;temp = temp->nextArrival)
+		{
+			cout<<"Flight Number: "<<temp->flightNo<<endl;
+			cout<<"Departure City: "<<temp->departCity<<"\t\t\t";
+			cout<<"Arrival City: "<<temp->arrivalCity<<endl;
+			cout<<"Departure Time: "<<temp->timeDepart<<"\t\t\t";
+			cout<<"Arrival Time: "<<temp->timeArrival<<endl;
+		}
+		cout<<endl;
+		cout<<endl;
+	}
+	system("pause");
+}
+
+
+
+
+void swap(flightNode temp[],flightNode temp1[])
+{
+	flightNode *temp2 = new flightNode[1];
+	temp2 = temp;
+    temp = temp1;
+    temp1 = temp2;
+}
+
+void ParticularArrival(cityListNode citylist[])
+{
+	system("cls");
+	
+	flightNode *temp = new flightNode[10];
+	
+	for(int i=0;i<10;i++)
+	{
+		temp[i].timeArrival = 0;
+		temp[i].timeDepart = 0;
+	}
+	
+	string cityname;
+	cout<<"Enter the city name where do you want to go"<<endl;
+	cin.ignore();
+	getline(cin,cityname);
+	
+	for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp1 = citylist[i].nextDeparture;temp1!=NULL;temp1=temp1->nextDeparture)
+		{
+			if(temp1->arrivalCity==cityname)
+			{
+				temp[i].arrivalCity = temp1->arrivalCity;
+				temp[i].departCity = temp1->departCity;
+				temp[i].flightNo = temp1->flightNo;
+				temp[i].timeArrival = temp1->timeArrival;
+				temp[i].timeDepart = temp1->timeDepart;
+			}
+		}
+	}
+	
+	int n = 10; 
+    for (int i = 0; i < 10; i++)
+	{
+	    for (int j = 1; j <  n; j++) 
+	    {
+	         if (temp[j].timeDepart < temp[j-1].timeDepart) 
+			 {
+	               swap(temp[j-1],temp[j]) ;
+	         }
+	    }
+	}
+	
+	
+
+	for(int i=0;i<10;i++)
+	{
+		if(temp[i].timeDepart!=0)
+		{
+			cout<<"------------------------------"<<endl;
+		    cout<<"Flight List Departure"<<endl;
+		    cout<<"------------------------------"<<endl;
+		    cout<<"Flight Number: "<<temp[i].flightNo<<endl;
+		    cout<<"Departure City: "<<temp[i].departCity<<"\t\t\t";
+		    cout<<"Arrival City: "<<temp[i].arrivalCity<<endl;
+		    cout<<"Departure Time: "<<temp[i].timeDepart<<"\t\t\t";
+		    cout<<"Arrival City: "<<temp[i].timeArrival<<endl;
+		}
+	}
+	system("pause");
+}
+
+
+void ParticularDeparture(cityListNode citylist[])
+{
+	system("cls");
+	
+	flightNode *temp = new flightNode[10];
+	
+	for(int i=0;i<10;i++)
+	{
+		temp[i].timeArrival = 0;
+		temp[i].timeDepart = 0;
+	}
+	
+	string cityname;
+	cout<<"Enter the city name from where do you want to go"<<endl;
+	cin.ignore();
+	getline(cin,cityname);
+	
+	for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp1 = citylist[i].nextArrival;temp1!=NULL;temp1=temp1->nextArrival)
+		{
+			if(temp1->departCity==cityname)
+			{
+				temp[i].arrivalCity = temp1->arrivalCity;
+				temp[i].departCity = temp1->departCity;
+				temp[i].flightNo = temp1->flightNo;
+				temp[i].timeArrival = temp1->timeArrival;
+				temp[i].timeDepart = temp1->timeDepart;
+			}
+		}
+	}
+	
+	int n = 10; 
+    for (int i = 0; i < 10; i++)
+	{
+	    for (int j = 1; j <  n; j++) 
+	    {
+	         if (temp[j].timeDepart < temp[j-1].timeDepart) 
+			 {
+	               swap(temp[j-1],temp[j]) ;
+	         }
+	    }
+	}
+	
+	
+
+	for(int i=0;i<10;i++)
+	{
+		if(temp[i].timeDepart!=0)
+		{
+			cout<<"------------------------------"<<endl;
+		    cout<<"Flight List Departure"<<endl;
+		    cout<<"------------------------------"<<endl;
+		    cout<<"Flight Number: "<<temp[i].flightNo<<endl;
+		    cout<<"Departure City: "<<temp[i].departCity<<"\t\t\t";
+		    cout<<"Arrival City: "<<temp[i].arrivalCity<<endl;
+		    cout<<"Departure Time: "<<temp[i].timeDepart<<"\t\t\t";
+		    cout<<"Arrival City: "<<temp[i].timeArrival<<endl;
+		}
+	}
+	system("pause");
+}
+
+
+
+
+void Reservation(reservationNode *Head,reservationNode *Tail,cityListNode citylist[])
+{
+	system("cls");
+	reservationNode *newnode = new reservationNode;
+	newnode->nextReserve=NULL;
+    cout<<"From where Do you want to go ?"<<endl;
+    for(int i=0;i<10;i++)
+    {
+    	cout<<i+1<<". "<<citylist[i].cityName<<endl;
+	}
+    cin.ignore();
+    getline(cin,newnode->departcity);
+	
+    for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp1 = citylist[i].nextDeparture;temp1!=NULL;temp1=temp1->nextDeparture)
+		{
+			if(temp1->departCity==newnode->departcity)
+			{
+	    		cout<<"------------------------------"<<endl;
+		        cout<<"Flight List Departure"<<endl;
+    		    cout<<"------------------------------"<<endl;
+    		    cout<<"Flight Number: "<<temp1->flightNo<<endl;
+    		    cout<<"Departure City: "<<temp1->departCity<<"\t\t\t";
+    		    cout<<"Arrival City: "<<temp1->arrivalCity<<endl;
+    		    cout<<"Departure Time: "<<temp1->timeDepart<<"\t\t\t";
+    		    cout<<"Arrival City: "<<temp1->timeArrival<<endl;
+			}
+		}
+	}
+	cout<<endl;
+	cout<<"Where Do you want to go ?"<<endl;
+    getline(cin,newnode->arrivecity);
+    
+    int count = 0;
+    for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp1 = citylist[i].nextDeparture;temp1!=NULL;temp1=temp1->nextDeparture)
+		{
+			if(temp1->departCity==newnode->departcity)
+			{
+	    		if(temp1->arrivalCity==newnode->arrivecity)
+	    		{
+	    			count++;
+	    			cout<<"Please Enter Your First Name"<<endl;
+	    			getline(cin,newnode->firstName);
+	    			cout<<"Please Enter Your Last Name"<<endl;
+	    			getline(cin,newnode->lastName);
+	    			cout<<"Are you Planning for a 1-way trip or a Round trip?"<<endl;
+                    cout<<"0 for 1-way\n1 for Round trip"<<endl;
+	    			cin>>newnode->tripType;
+	    			if(newnode->tripType==0)
+	    			{
+	    				cout<<"Enter Your Date For Departure"<<endl;
+	    				cin>>newnode->departDay;
+	    				newnode->flightNoDepart=temp1->flightNo;
+	    				newnode->arriveDay=0;
+	    				newnode->flightNoArrive=0;
+	    				newnode->departtime=temp1->timeDepart;
+	    				newnode->arrivetime=temp1->timeArrival;
+					}
+					else if(newnode->tripType==1)
+					{
+						cout<<"Enter Your Date For Departure"<<endl;
+	    				cin>>newnode->departDay;
+	    				cout<<"Enter Your Date For Arrival"<<endl;
+	    				cin>>newnode->arriveDay;
+	    				newnode->flightNoDepart=temp1->flightNo;
+	    				newnode->flightNoArrive=temp1->flightNo;
+	    				newnode->departtime=temp1->timeDepart;
+	    				newnode->arrivetime=temp1->timeArrival;
+					}
+				}
+			}
+		}
+	}
+	if(count==0)
+	{
+		cout<<"Sorry! No Such Flight Found from "<<newnode->departcity<<" to "<<newnode->arrivecity<<endl;
+	}
+	if(count==1)
+	{
+		cout<<"Your Seat has been Booked"<<endl;
+	}
+    
+    for(reservationNode *temp=Head;temp->nextReserve!=NULL;temp=temp->nextReserve)
+    {
+    	if(temp->nextReserve==Tail)
+    	{
+    		temp->nextReserve=newnode;
+    		newnode->nextReserve=Tail;
+		}
+	}
+    
+	system("pause");
+    
+}
+
+void DisplayCity(string tempname2[])
+{
+	for(int i=0;i<9;i++)
+	{
+		cout<<"-----------------"<<endl;
+	    cout<<"Flight Departure"<<endl;
+    	cout<<"-----------------"<<endl;
+    	cout<<"Arrival City: "<<tempname2[i]<<endl;
+    	cout<<"Flight Number: "<<tempname2[i]<<endl;
+    	cout<<"Departure Time: "<<tempname2[i]<<"\t\t\t";
+	    cout<<"Arrival Number: "<<tempname2[i]<<endl;
+	}
+	system("pause");
+}
+
+void Recursion(string name,string tempname2[])
+{
+	int count=0;
+	for(int i=0;i<10;i++)
+	{
+		if(tempname2[i]!="NULL")
+		{
+			count++;
+		}
+	}
+	if(count==9)
+	{
+		DisplayCity(tempname2);
+		return;
+	}
+	for(int i=0;i<10;i++)
+	{
+		for(int j=0;j<10;j++)
+		{
+			for(flightNode *temp = citylist[j].nextDeparture;temp!=NULL;temp=temp->nextDeparture)
+			{
+				if(temp->departCity==tempname2[i])
+				{
+					if(temp->arrivalCity==name)
+					{
+						break;
+					}
+					else if(temp->arrivalCity!=name)
+					{
+						int k=0;
+						for(int k=0;k<10;k++)
+						{
+							if(temp->arrivalCity==tempname2[k])
+							{
+								k=1;
+								break;
+							}
+						}
+						if(k==1)
+						continue;
+					}
+					else
+					{
+						for(int k=0;k<10;k++)
+						{
+							if(tempname2[k]=="NULL")
+							{
+								tempname2[k]=temp->arrivalCity;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	Recursion(name,tempname2);
+	return;
+}
+
+void DisplayCitiesFrom(string name,cityListNode citylist[])
+{
+	string tempname1[10];
+	string tempname2[10];
+	for(int i=0;i<10;i++)
+	{
+		tempname1[i]="NULL";
+		tempname2[i]="NULL";
+	}
+	for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp = citylist[i].nextDeparture;temp!=NULL;temp=temp->nextDeparture)
+		{
+			if(temp->departCity==name)
+			{
+				for(int j=0;j<10;j++)
+				{
+					if(tempname1[j]=="NULL")
+					{
+						tempname1[j]=temp->arrivalCity;
+						break;
+					}
+				}
+			}
+		}	
+	}
+	for(int i=0;i<10;i++)
+	{
+		if(tempname1[i]!="NULL")
+		{
+			for(int j=0;j<10;j++)
+			{
+				if(tempname2[j]=="NULL")
+				{
+					tempname2[j]=tempname1[i];
+					break;
+				}
+			}
+		}
+	}
+	Recursion(name,tempname2);
+	
+}
+
+
+void PrintReservation(reservationNode *Head,reservationNode *Tail)
+{
+	system("cls");
+	string name1;
+	string name2;
+	int count=0;
+	cout<<"Please Enter the first name and last name respectively on which the seat has been Booked"<<endl;
+	cin.ignore();
+	cout<<"First Name: ";
+	getline(cin,name1);
+	cout<<"Last Name: ";
+	getline(cin,name2);
+	for(reservationNode *temp = Head;temp->nextReserve!=NULL;temp=temp->nextReserve)
+	{
+		if(name1==temp->firstName)
+		{
+			if(name2==temp->lastName)
+			{
+				count++;
+				cout<<"Your Travel Details"<<endl;
+				cout<<"Departure City: "<<temp->departcity<<"\t\t\t"<<"Arrival City: "<<temp->arrivecity<<endl;
+				if(temp->tripType==0)
+				{
+					cout<<"Trip Type: One Way Trip"<<endl;
+					cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+					cout<<"Day: "<<temp->departDay<<endl;
+					cout<<"Flight Number: "<<temp->flightNoDepart<<endl;;
+				}
+				if(temp->tripType==1)
+				{
+					cout<<"Trip Type: Round Way Trip"<<endl;
+					cout<<"Departure Day: "<<temp->departDay<<endl;
+					cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+					cout<<"Departure Flight Number: "<<temp->flightNoDepart<<endl;
+					cout<<"Arrival Day: "<<temp->arriveDay<<endl;
+					cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+					cout<<"Flight Number: "<<temp->flightNoArrive<<endl;
+				}
+			}
+		}
+	}
+	if(count==0)
+	{
+		cout<<"Sorry No Seat Found For Name: "<<name1<<" "<<name2<<endl;
+	}
+	system("pause");
+	
+}
+
+
+void DeleteReservation(reservationNode *Head,reservationNode *Tail)
+{
+	system("cls");
+	string name1;
+	string name2;
+	int count=0;
+	cout<<"Please Enter the first name and last name respectively on which the seat has been Booked"<<endl;
+	cin.ignore();
+	cout<<"First Name: ";
+	getline(cin,name1);
+	cout<<"Last Name: ";
+	getline(cin,name2);
+	reservationNode *temp1;
+	temp1=Head;
+	for(reservationNode *temp = Head->nextReserve;temp!=NULL;temp=temp->nextReserve)
+	{
+		if(name1==temp->firstName)
+		{
+			if(name2==temp->lastName)
+			{
+				char final;
+				cout<<"Are you sure you want to Cancel the Booking\nY for Yes\nN for No"<<endl;
+				cin>>final;
+				if(final=='Y'||final=='y')
+				{
+					if(Head->nextReserve==temp)
+					{
+						if(temp->nextReserve==Tail)
+						{
+							count++;
+							Head->nextReserve=Tail;
+							delete(temp);
+						}
+						else 
+				    	{
+					    	count++;
+			     	        Head->nextReserve=temp->nextReserve;
+			            	delete(temp);
+					    }
+					}
+					else 
+					{
+						count++;
+			     	    temp1->nextReserve=temp->nextReserve;
+			        	delete(temp);
+					}
+				}
+				if(final=='N'||final=='n')
+				{
+					count = count+2;
+				}
+			}
+		}
+		temp1=temp1->nextReserve;
+	}
+	if(count==0)
+	{
+		cout<<"Sorry! No Booking Found with name "<<name1<<" "<<name2<<endl;
+	}
+	if(count==1)
+	{
+		cout<<"Your Booking has been cancelled"<<endl;
+	}
+	if(count==2)
+	{
+		cout<<"Thank You for Flying with us "<<endl;
+	}
+	system("pause");
+}
+
+void swap1(string temp[],int x,int y)
+{
+    string temp1 = temp[ x ];
+    temp[ x ] = temp[ y ];
+    temp[ y ] = temp1;
+}
+
+void DisplayAllPassengers(reservationNode *Head,reservationNode *Tail)
+{
+	system("cls");
+	string temp[20];
+	for(int i=0;i<20;i++)
+	{
+		temp[i]="NULL";
+	}
+	int j=0;
+	for(reservationNode *temp1 = Head->nextReserve; temp1!=Tail;temp1=temp1->nextReserve)
+	{
+		if(temp[j]=="NULL")
+		{
+			temp[j]=temp1->lastName;
+		}
+		j++;
+	}
+	for (int i=0;i<20;i++)
+	{	
+	    for (int j=1;j<20;j++) 
+		{
+	        if (temp[j] < temp[j-1]) 
+			{
+	               swap1(temp,j-1 , j);
+	        }
+	    }
+	}
+	
+	int count=0;
+	for(int i=0;i<20;i++)
+	{
+		string name1;
+		name1=temp[i];
+		for(reservationNode *temp = Head;temp->nextReserve!=NULL;temp=temp->nextReserve)
+    	{
+	    	if(name1==temp->lastName)
+	    	{
+	    		count++;
+	    		cout<<"--------------------------------------------------------------"<<endl;
+	    		cout<<"Passenger Details"<<endl;
+	    		cout<<"Name: "<<temp->firstName<<" "<<temp->lastName<<endl;
+	     		cout<<"Departure City: "<<temp->departcity<<"\t\t\t"<<"Arrival City: "<<temp->arrivecity<<endl;
+	    		if(temp->tripType==0)
+	    		{
+	    			cout<<"Trip Type: One Way Trip"<<endl;
+	    			cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+	    			cout<<"Day: "<<temp->departDay<<endl;
+		    		cout<<"Flight Number: "<<temp->flightNoDepart<<endl;
+		    	}
+		    	if(temp->tripType==1)
+		    	{
+		    		cout<<"Trip Type: Round Way Trip"<<endl;
+		    		cout<<"Departure Day: "<<temp->departDay<<endl;
+		    		cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+		    		cout<<"Departure Flight Number: "<<temp->flightNoDepart<<endl;
+		    		cout<<"Arrival Day: "<<temp->arriveDay<<endl;
+		     		cout<<"Depart Time: "<<temp->departtime<<"\t\t\tArrive Time: "<<temp->arrivetime<<endl;
+		    		cout<<"Flight Number: "<<temp->flightNoArrive<<endl<<endl;
+		    	}
+		        cout<<"--------------------------------------------------------------"<<endl;	
+		    }
+		}
+    }
+    if(count==0)
+	{
+	  	cout<<"No Reservations Yet"<<endl;
+	}		
+    system("pause");
+}
+
+
+/*void RecursionForShortestPath(int *count,int *shortestdistance,string *shortestpath[10], string name2,string *cities[],int *distance[])
+{
+	for(int i=0;i<10;i++)
+	{
+		for(flightNode *temp = citylist[i].nextDeparture;temp!=NULL;temp=temp->nextDeparture)
+		{
+			for(int k=0;k<10;k++)
+			{
+				if(temp->departCity==*cities[k])
+				{
+					for(flightNode *temp1 = temp;temp1!=NULL;temp1=temp1->nextDeparture)
+					{
+						if(temp->arrivalCity==name2)
+			     		{
+			     			count++;
+				    		distance[k]=distance[k]+(temp->timeArrival-temp->timeDepart);
+				    		*shortestdistance=*distance[k];
+				    		for(int x=0;x<10;x++)
+				    		{
+				    			if(*shortestpath[x]=="NULL")
+				    			{
+				    				*shortestpath[x]=temp->departCity;
+				    				*shortestpath[x+1]=temp->arrivalCity;
+								}
+							}
+			    		}
+					}
+					if(*count==1);
+					return;
+					if(temp->arrivalCity!=name2)
+					{
+						for(int x=0;x<10;x++)
+						{
+							if(*cities[x]!="NULL")
+							continue;
+							else
+							{
+							    cities[x]=temp->arrivalCity;
+							    distance[x]=temp->timeArrival-temp->timeDepart;
+							}
+						}
+					}	
+				}
+			}
+		}
+	}
+}
+
+void ShortestPath(cityListNode citylist[])
+{
+	system("cls");
+	int shortestdistance=0;
+	string shortestpath[10];
+	for(int i=0;i<10;i++)
+	{
+		shortestpath[i]="NULL";
+	}
+	string name1;
+	string name2;
+	for(int i=0;i<10;i++)
+	{
+		cout<<i+1<<". "<<citylist[i].cityName<<endl;
+	}
+	cout<<"Enter the city name from where you want to go"<<endl;
+	cin.ignore();
+	getline(cin,name1);
+	cout<<"Enter the city name where you want to go"<<endl;
+	getline(cin,name2);
+	
+	shortestpath[0]=name1;
+	
+	int distance[10];
+	string cities[10];
+	for(int i=0;i<10;i++)
+	{
+		distance[i]=9999;
+		cities[i]="NULL";
+	}
+	int j=0;
+	int count=0;
+	for(int i=0;i<10;i++)
+	{		
+		for(flightNode *temp = citylist[i].nextDeparture;temp!=NULL;temp=temp->nextDeparture)
+		{
+			if(temp->departCity==name1)
+			{
+				for(flightNode *temp1 = temp;temp1!=NULL;temp1=temp1->nextDeparture)
+				{
+					if(temp->arrivalCity==name2)
+			     	{
+			    		distance[j]=temp->timeArrival-temp->timeDepart;
+			    		shortestdistance=distance[j];
+			    		shortestpath[1]=name2;
+			    		count++;
+			    	}
+				}
+				if(count==1)
+				break;
+				
+				else if(temp->arrivalCity!=name2)
+				{
+				    cities[j]=temp->arrivalCity;
+				    distance[j]=temp->timeArrival-temp->timeDepart;
+				    j++;
+				}
+			}
+		}
+	}
+	if(count==0)
+	{
+		RecursionForShortestPath(&count,&shortestdistance,&shortestpath,name2,&cities,&distance);
+	}
+	if(count==1)
+	{
+		cout<<"Shortest Path is from";
+		for(int i=0;i<10;i++)
+		{
+			if(shortestpath[i]!="NULL")
+			{
+				cout<<shortestpath[i]<<"-->";
+			}
+		}
+		cout<<" in "<<shortestdistance<<" hours"<<endl;
+	}
+}*/
+
+int main()
+{
+	reservationNode *Head = new reservationNode;
+	reservationNode *Tail = new reservationNode;
+	Head->nextReserve=Tail;
+	Tail->nextReserve=NULL;
+	
+	citylist[0].cityName = "Lahore";
+    citylist[1].cityName = "Karachi";
+    citylist[2].cityName = "Kuwait";
+    citylist[3].cityName = "Dubai";
+    citylist[4].cityName = "Colombo";
+    citylist[5].cityName = "Muscat";
+    citylist[6].cityName = "Dacca";
+    citylist[7].cityName = "Bangkok";
+    citylist[8].cityName = "Manila";
+    citylist[9].cityName = "Tokyo";
+    
+    DataEntryDeparture("Lahore","Karachi","Lahore",102,900,1030);
+    DataEntryArrival("Lahore","Lahore","Karachi",201,2100,2230);
+	
+	DataEntryDeparture("Karachi","Lahore","Karachi",201,2100,2230);
+    DataEntryDeparture("Karachi","Kuwait","Karachi",203,1130,1300);
+	DataEntryDeparture("Karachi","Dubai","Karachi",204,1500,1600);
+	DataEntryDeparture("Karachi","Colombo","Karachi",206,700,1000);
+	DataEntryArrival("Karachi","Karachi","Lahore",102,900,1030);
+	DataEntryArrival("Karachi","Karachi","Kuwait",302,1400,1530);
+	DataEntryArrival("Karachi","Karachi","Muscat",502,1900,2000);
+	DataEntryArrival("Karachi","Karachi","Colombo",602,1900,2200);
+	
+	DataEntryDeparture("Kuwait","Karachi","Kuwait",302,1400,1530);
+	DataEntryDeparture("Kuwait","Dubai","Kuwait",304,1400,1500);
+	DataEntryArrival("Kuwait","Kuwait","Karachi",203,1130,1300);
+	DataEntryArrival("Kuwait","Kuwait","Dubai",403,1600,1700);
+	
+	DataEntryDeparture("Dubai","Kuwait","Dubai",403,1600,1700);
+	DataEntryDeparture("Dubai","Muscat","Dubai",405,1400,1500);
+	DataEntryArrival("Dubai","Dubai","Kuwait",304,1400,1500);
+	DataEntryArrival("Dubai","Dubai","Karachi",204,1500,1600);
+	
+	
+	DataEntryDeparture("Colombo","Karachi","Colombo",602,1900,2200);
+	DataEntryDeparture("Colombo","Dacca","Colombo",607,1100,1400);
+	DataEntryArrival("Colombo","Colombo","Karachi",206,700,1000);
+	DataEntryArrival("Colombo","Colombo","Dacca",706,1500,1800);
+
+	DataEntryDeparture("Muscat","Karachi","Muscat",502,1900,2000);
+	DataEntryArrival("Muscat","Muscat","Dubai",405,1600,1700);
+
+	DataEntryDeparture("Dacca","Colombo","Dacca",706,1500,1800);
+	DataEntryDeparture("Dacca","Bangkok","Dacca",708,1500,1700);
+	DataEntryDeparture("Dacca","Tokyo","Dacca",711,1500,1900);
+	DataEntryArrival("Dacca","Dacca","Colombo",607,1100,1400);
+	DataEntryArrival("Dacca","Dacca","Bangkok",807,1900,2100);
+	DataEntryArrival("Dacca","Dacca","Tokyo",119,800,1200);
+	
+	DataEntryDeparture("Bangkok","Dacca","Bangkok",807,1900,2100);
+	DataEntryDeparture("Bangkok","Manila","Bangkok",809,1800,2000);
+	DataEntryArrival("Bangkok","Bangkok","Dacca",708,1500,1700);
+	DataEntryArrival("Bangkok","Bangkok","Manila",908,2100,2300);
+	
+	DataEntryDeparture("Manila","Bangkok","Manila",908,2100,2300);
+	DataEntryDeparture("Manila","Tokyo","Manila",911,2030,2330);
+	DataEntryArrival("Manila","Manila","Bangkok",809,1800,2000);
+	DataEntryArrival("Manila","Manila","Tokyo",119,200,500);
+	
+	DataEntryDeparture("Tokyo","Manila","Tokyo",119,200,500);
+	DataEntryDeparture("Tokyo","Dacca","Tokyo",117,800,1200);
+	DataEntryArrival("Tokyo","Tokyo","Manila",911,2030,2330);
+	DataEntryArrival("Tokyo","Tokyo","Dacca",711,1500,1900);
+	
+	int option = -1;
+	while(option!=0)
+	{
+		system("cls");
+		cout<<"*****Airline Reservation System*****"<<endl;
+		cout<<"Enter Choice"<<endl;
+		cout<<"1. List of all the cities serviced by airline "<<endl;
+		cout<<"2. List of flight departures from a particular city"<<endl;
+		cout<<"3. List of flight arrivals for a particular city"<<endl;
+		cout<<"4. List of all the cities which can be reached from a particular city."<<endl;
+		cout<<"5. List of cities in the shortest path between any two cities."<<endl;
+		cout<<"6. Find the shortest route between any two cities."<<endl;
+		cout<<"7. Make an airline reservation for a passenger between two cities."<<endl;
+		cout<<"8. Print a passenger's reservation schedule."<<endl;
+		cout<<"9. Delete a passenger's reservation."<<endl;
+		cout<<"10. Print a list of passengers of a particular flight (in order of last name)."<<endl;
+		cout<<"\nPress 0 to EXIT"<<endl<<endl;
+		cin>>option;
+		switch(option)
+		{
+			case 1:
+				{
+					Allflights(citylist);
+					break;
+				}
+			case 2:
+				{
+					ParticularDeparture(citylist);
+					break;
+				}
+			case 3:
+				{
+					ParticularArrival(citylist);
+					break;
+				}
+			case 4:
+				{
+					string name;
+                  	cout<<"Enter the name of the city from where you want Flights to arrive"<<endl;
+                	cin.ignore();
+                	getline(cin,name);
+					DisplayCitiesFrom(name,citylist);
+					break;
+				}
+			case 5:
+				{
+				//	ShortestPath(citylist);
+					break;
+				}
+			case 6:
+				{
+				//	ShortestPath(citylist);
+					break;
+				}
+			case 7:
+				{
+					Reservation(Head,Tail,citylist);
+					break;
+				}
+			case 8:
+				{
+					PrintReservation(Head,Tail);
+					break;
+				}
+			case 9:
+				{
+					DeleteReservation(Head,Tail);
+					break;
+				}
+			case 10:
+				{
+					DisplayAllPassengers(Head,Tail);
+					break;
+				}									
+		}
+	}
+}
